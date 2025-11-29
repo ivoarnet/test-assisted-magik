@@ -1,0 +1,303 @@
+#% text_encoding = iso8859_1
+##
+## @name 07_exception_handling.magik
+## @description Demonstrates exception handling in Magik
+## @author Copilot AI Assistant
+##
+
+_package sw
+
+$
+
+##======================================================================
+## Basic Exception Handling
+##======================================================================
+
+_method object.demo_basic_exception()
+    ## Demonstrates basic try-catch pattern in Magik
+    ## 
+    ## @return _unset
+    
+    write("=== Basic Exception Handling ===")
+    write("")
+    
+    # Using _protect block
+    write("Using _protect block:")
+    _protect
+        write("  Inside protected block")
+        write("  Doing some work...")
+        # Simulated work
+        _local result << 10 / 2
+        write("  Result: ", result)
+    _protection
+        write("  This always executes (like finally)")
+    _endprotect
+    write("")
+    
+    # Using _catch and _throw
+    write("Using _catch and _throw:")
+    _local caught_value << _catch :my_tag
+        write("  Before throw")
+        _throw :my_tag _with "Caught this value!"
+        write("  This line never executes")
+    _endcatch
+    write("  Caught value: ", caught_value)
+    write("")
+    
+    _return _unset
+_endmethod
+$
+
+##======================================================================
+## Condition Handling
+##======================================================================
+
+_method object.demo_condition_handling()
+    ## Demonstrates condition (exception) handling in Magik
+    ## 
+    ## @return _unset
+    
+    write("=== Condition Handling ===")
+    write("")
+    
+    # Handling conditions
+    write("Handling conditions:")
+    _block
+        _handling error, warning _with
+            _proc(cond)
+                write("  Caught condition: ", cond.name)
+                write("  Message: ", cond.report_contents_string)
+            _endproc
+        
+        # This would normally raise an error
+        write("  Protected code block")
+    _endblock
+    write("")
+    
+    _return _unset
+_endmethod
+$
+
+##======================================================================
+## Raising Conditions
+##======================================================================
+
+_method object.demo_raise_condition()
+    ## Demonstrates raising conditions (exceptions)
+    ## 
+    ## @return _unset
+    
+    write("=== Raising Conditions ===")
+    write("")
+    
+    # Example of catching a raised condition
+    write("Catching a raised condition:")
+    _block
+        _handling user_error _with
+            _proc(cond)
+                write("  Caught user error!")
+                write("  Details: ", cond.report_contents_string)
+                _return _false
+            _endproc
+        
+        write("  About to raise condition...")
+        _self.validate_input(-5)
+    _endblock
+    write("")
+    
+    _return _unset
+_endmethod
+$
+
+## Helper method that validates input
+_method object.validate_input(value)
+    ## Validates that value is positive
+    ## 
+    ## @param value {number} The value to validate
+    ## @return {boolean} True if valid
+    
+    _if value < 0
+    _then
+        condition.raise(:user_error, :string, "Value must be positive!")
+    _endif
+    
+    _return _true
+_endmethod
+$
+
+##======================================================================
+## Catch with Tags
+##======================================================================
+
+_method object.demo_catch_tags()
+    ## Demonstrates using catch with different tags
+    ## 
+    ## @return _unset
+    
+    write("=== Catch with Tags ===")
+    write("")
+    
+    # Nested catches with different tags
+    write("Nested catches with different tags:")
+    
+    _local outer_result << _catch :outer_tag
+        write("  In outer catch block")
+        
+        _local inner_result << _catch :inner_tag
+            write("  In inner catch block")
+            write("  About to throw to inner tag...")
+            _throw :inner_tag _with "Inner value"
+            write("  This won't execute")
+        _endcatch
+        
+        write("  Inner result: ", inner_result)
+        write("  Continuing outer block...")
+        
+        _throw :outer_tag _with "Outer value"
+        write("  This won't execute either")
+    _endcatch
+    
+    write("  Outer result: ", outer_result)
+    write("")
+    
+    _return _unset
+_endmethod
+$
+
+##======================================================================
+## Practical Exception Patterns
+##======================================================================
+
+_method object.safe_divide(a, b)
+    ## Safely divides two numbers, handling division by zero
+    ## 
+    ## @param a {number} Numerator
+    ## @param b {number} Denominator
+    ## @return {number|unset} Result or unset on error
+    
+    _if b = 0
+    _then
+        write("  Warning: Division by zero attempted!")
+        _return _unset
+    _endif
+    
+    _return a / b
+_endmethod
+$
+
+_method object.demo_safe_operations()
+    ## Demonstrates safe operation patterns
+    ## 
+    ## @return _unset
+    
+    write("=== Safe Operation Patterns ===")
+    write("")
+    
+    # Safe division
+    write("Safe division examples:")
+    write("  10 / 2 = ", _self.safe_divide(10, 2))
+    write("  10 / 0 = ", _self.safe_divide(10, 0))
+    write("")
+    
+    # Safe access pattern
+    write("Safe access pattern:")
+    _local data << hash_table.new()
+    data[:exists] << "I exist!"
+    
+    _local value1 << _self.safe_get(data, :exists, "default")
+    _local value2 << _self.safe_get(data, :missing, "default")
+    
+    write("  data[:exists] with default: ", value1)
+    write("  data[:missing] with default: ", value2)
+    write("")
+    
+    _return _unset
+_endmethod
+$
+
+_method object.safe_get(hash, key, default_value)
+    ## Safely gets a value from a hash table with a default
+    ## 
+    ## @param hash {hash_table} The hash table
+    ## @param key {object} The key to look up
+    ## @param default_value {object} Default value if key not found
+    ## @return {object} The value or default
+    
+    _if hash.includes_key?(key)
+    _then
+        _return hash[key]
+    _else
+        _return default_value
+    _endif
+_endmethod
+$
+
+##======================================================================
+## Cleanup Pattern
+##======================================================================
+
+_method object.demo_cleanup_pattern()
+    ## Demonstrates proper resource cleanup pattern
+    ## 
+    ## @return _unset
+    
+    write("=== Cleanup Pattern ===")
+    write("")
+    
+    write("Resource cleanup with _protect:")
+    _local resource_acquired << _false
+    
+    _protect
+        # Acquire resource
+        write("  Acquiring resource...")
+        resource_acquired << _true
+        write("  Resource acquired: ", resource_acquired)
+        
+        # Do work
+        write("  Doing work with resource...")
+        
+        # Simulate some error
+        write("  Work completed successfully")
+        
+    _protection
+        # Always release resource
+        _if resource_acquired
+        _then
+            write("  Releasing resource...")
+            resource_acquired << _false
+            write("  Resource released")
+        _endif
+    _endprotect
+    
+    write("  Final resource state: ", resource_acquired)
+    write("")
+    
+    _return _unset
+_endmethod
+$
+
+##======================================================================
+## Master demo method
+##======================================================================
+
+_method object.demo_exceptions()
+    ## Runs all exception handling demonstrations
+    ## 
+    ## @return _unset
+    
+    write("========================================")
+    write("  EXCEPTION HANDLING DEMONSTRATION")
+    write("========================================")
+    write("")
+    
+    _self.demo_basic_exception()
+    write("")
+    _self.demo_catch_tags()
+    write("")
+    _self.demo_safe_operations()
+    write("")
+    _self.demo_cleanup_pattern()
+    
+    _return _unset
+_endmethod
+$

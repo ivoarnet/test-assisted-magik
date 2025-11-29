@@ -1,0 +1,234 @@
+#% text_encoding = iso8859_1
+##
+## @name 03_control_flow.magik
+## @description Demonstrates control flow statements in Magik
+## @author Copilot AI Assistant
+##
+
+_package sw
+
+$
+
+##
+## Demonstrate if-then-else statements
+##
+_method object.demo_conditionals()
+    ## Shows conditional statements in Magik
+    ## 
+    ## @return _unset
+    
+    write("=== Conditional Statements ===")
+    write("")
+    
+    _local score << 85
+    
+    # Simple if statement
+    write("Simple _if example (score = ", score, "):")
+    _if score >= 60
+    _then
+        write("  Result: Passed!")
+    _endif
+    write("")
+    
+    # If-else statement
+    _local temperature << 25
+    write("If-else example (temperature = ", temperature, "):")
+    _if temperature > 30
+    _then
+        write("  It's hot outside!")
+    _else
+        write("  Temperature is comfortable.")
+    _endif
+    write("")
+    
+    # If-elif-else statement (using nested ifs)
+    _local grade << 75
+    write("Multiple conditions (grade = ", grade, "):")
+    _if grade >= 90
+    _then
+        write("  Grade: A")
+    _elif grade >= 80
+    _then
+        write("  Grade: B")
+    _elif grade >= 70
+    _then
+        write("  Grade: C")
+    _elif grade >= 60
+    _then
+        write("  Grade: D")
+    _else
+        write("  Grade: F")
+    _endif
+    write("")
+    
+    # Inline conditional (ternary-like)
+    _local status << _if score > 50 _then >> "Pass" _else >> "Fail" _endif
+    write("Inline conditional result: ", status)
+    
+    _return _unset
+_endmethod
+$
+
+##
+## Demonstrate loops
+##
+_method object.demo_loops()
+    ## Shows various loop constructs in Magik
+    ## 
+    ## @return _unset
+    
+    write("=== Loop Constructs ===")
+    write("")
+    
+    # _over loop with range
+    write("_over loop (1 to 5):")
+    _over i _over range(1, 5)
+    _loop
+        write("  Iteration: ", i)
+    _endloop
+    write("")
+    
+    # _loop with counter
+    write("_loop with manual counter:")
+    _local counter << 1
+    _loop
+        write("  Count: ", counter)
+        counter << counter + 1
+        _if counter > 5
+        _then
+            _leave
+        _endif
+    _endloop
+    write("")
+    
+    # _while loop
+    write("_while loop example:")
+    _local n << 5
+    _while n > 0
+    _loop
+        write("  Countdown: ", n)
+        n << n - 1
+    _endloop
+    write("  Blast off!")
+    write("")
+    
+    # Iterating over a collection
+    _local fruits << {"apple", "banana", "cherry", "date"}
+    write("Iterating over a simple vector:")
+    _for fruit _over fruits.fast_elements()
+    _loop
+        write("  Fruit: ", fruit)
+    _endloop
+    write("")
+    
+    # Loop with _continue
+    write("Loop with _continue (skip even numbers):")
+    _over i _over range(1, 10)
+    _loop
+        _if (i _mod 2) = 0
+        _then
+            _continue
+        _endif
+        write("  Odd number: ", i)
+    _endloop
+    write("")
+    
+    # Loop with _leave (break)
+    write("Loop with _leave (stop at 5):")
+    _over i _over range(1, 10)
+    _loop
+        _if i > 5
+        _then
+            _leave
+        _endif
+        write("  Value: ", i)
+    _endloop
+    write("  Loop exited early!")
+    
+    _return _unset
+_endmethod
+$
+
+##
+## Demonstrate block statements
+##
+_method object.demo_blocks()
+    ## Shows block constructs and local scoping in Magik
+    ## 
+    ## @return _unset
+    
+    write("=== Block Constructs ===")
+    write("")
+    
+    # Named block with value return
+    write("Named block returning a value:")
+    _local result << _block @compute_value
+        _local x << 10
+        _local y << 20
+        >> x + y
+    _endblock
+    write("  Block result: ", result)
+    write("")
+    
+    # Block for scoping
+    write("Block for variable scoping:")
+    _local outer_var << "outer"
+    _block
+        _local inner_var << "inner"
+        write("  Inside block - outer: ", outer_var, ", inner: ", inner_var)
+    _endblock
+    write("  Outside block - outer: ", outer_var)
+    # inner_var is not accessible here
+    
+    _return _unset
+_endmethod
+$
+
+##
+## Demonstrate case/match expressions
+##
+_method object.demo_case()
+    ## Shows case statement in Magik
+    ## 
+    ## @param value {object} The value to check
+    ## @return _unset
+    
+    write("=== Case Statement ===")
+    write("")
+    
+    _local day_number << 3
+    
+    write("Case statement (day = ", day_number, "):")
+    _local day_name << _unset
+    
+    # Alternative approach using conditionals (Magik doesn't have traditional case)
+    _if day_number = 1
+    _then
+        day_name << "Monday"
+    _elif day_number = 2
+    _then
+        day_name << "Tuesday"
+    _elif day_number = 3
+    _then
+        day_name << "Wednesday"
+    _elif day_number = 4
+    _then
+        day_name << "Thursday"
+    _elif day_number = 5
+    _then
+        day_name << "Friday"
+    _elif day_number = 6
+    _then
+        day_name << "Saturday"
+    _elif day_number = 7
+    _then
+        day_name << "Sunday"
+    _else
+        day_name << "Unknown"
+    _endif
+    
+    write("  Day name: ", day_name)
+    
+    _return _unset
+_endmethod
+$

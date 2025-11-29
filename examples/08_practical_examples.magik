@@ -1,0 +1,647 @@
+#% text_encoding = iso8859_1
+##
+## @name 08_practical_examples.magik
+## @description Practical utility examples demonstrating real-world Magik usage
+## @author Copilot AI Assistant
+##
+
+_package sw
+
+$
+
+##======================================================================
+## Geometry Utilities
+##======================================================================
+
+def_slotted_exemplar(:geometry_utils,
+    {},
+    {:object})
+$
+
+## Calculate distance between two points
+_method geometry_utils.distance(x1, y1, x2, y2)
+    ## Calculates Euclidean distance between two points
+    ## 
+    ## @param x1 {float} X coordinate of first point
+    ## @param y1 {float} Y coordinate of first point
+    ## @param x2 {float} X coordinate of second point
+    ## @param y2 {float} Y coordinate of second point
+    ## @return {float} Distance between points
+    
+    _local dx << x2 - x1
+    _local dy << y2 - y1
+    _return (dx ** 2 + dy ** 2).sqrt
+_endmethod
+$
+
+## Calculate area of a polygon using Shoelace formula
+_method geometry_utils.polygon_area(vertices)
+    ## Calculates the area of a polygon using the Shoelace formula
+    ## 
+    ## @param vertices {simple_vector} Vector of {x, y} pairs
+    ## @return {float} Area of polygon
+    
+    _local n << vertices.size
+    _if n < 3
+    _then
+        _return 0.0
+    _endif
+    
+    _local sum << 0.0
+    
+    _for i _over range(1, n)
+    _loop
+        _local j << _if i = n _then >> 1 _else >> i + 1 _endif
+        _local vi << vertices[i]
+        _local vj << vertices[j]
+        
+        sum << sum + (vi[1] * vj[2]) - (vj[1] * vi[2])
+    _endloop
+    
+    _return (sum / 2).abs
+_endmethod
+$
+
+## Check if point is inside polygon (ray casting algorithm)
+_method geometry_utils.point_in_polygon?(x, y, vertices)
+    ## Checks if a point is inside a polygon using ray casting
+    ## 
+    ## @param x {float} X coordinate of point
+    ## @param y {float} Y coordinate of point
+    ## @param vertices {simple_vector} Vector of {x, y} pairs
+    ## @return {boolean} True if point is inside polygon
+    
+    _local n << vertices.size
+    _local inside << _false
+    
+    _local j << n
+    _for i _over range(1, n)
+    _loop
+        _local vi << vertices[i]
+        _local vj << vertices[j]
+        
+        _if (vi[2] > y) ~= (vj[2] > y) _andif
+            x < (vj[1] - vi[1]) * (y - vi[2]) / (vj[2] - vi[2]) + vi[1]
+        _then
+            inside << _not inside
+        _endif
+        
+        j << i
+    _endloop
+    
+    _return inside
+_endmethod
+$
+
+## Demo geometry utilities
+_method object.demo_geometry()
+    ## Demonstrates geometry utility functions
+    ## 
+    ## @return _unset
+    
+    write("=== Geometry Utilities ===")
+    write("")
+    
+    _local utils << geometry_utils
+    
+    # Distance calculation
+    write("Distance calculations:")
+    write("  Distance (0,0) to (3,4): ", utils.distance(0, 0, 3, 4))
+    write("  Distance (1,1) to (4,5): ", utils.distance(1, 1, 4, 5))
+    write("")
+    
+    # Polygon area
+    _local triangle << {{0, 0}, {4, 0}, {2, 3}}
+    _local square << {{0, 0}, {4, 0}, {4, 4}, {0, 4}}
+    
+    write("Polygon areas:")
+    write("  Triangle area: ", utils.polygon_area(triangle))
+    write("  Square area: ", utils.polygon_area(square))
+    write("")
+    
+    # Point in polygon
+    write("Point in polygon tests:")
+    write("  (2,1) in triangle: ", utils.point_in_polygon?(2, 1, triangle))
+    write("  (5,5) in triangle: ", utils.point_in_polygon?(5, 5, triangle))
+    write("  (2,2) in square: ", utils.point_in_polygon?(2, 2, square))
+    
+    _return _unset
+_endmethod
+$
+
+
+##======================================================================
+## String Utilities
+##======================================================================
+
+def_slotted_exemplar(:string_utils,
+    {},
+    {:object})
+$
+
+## Pad string to specified length
+_method string_utils.pad_left(str, length, pad_char)
+    ## Pads a string on the left to reach specified length
+    ## 
+    ## @param str {string} Input string
+    ## @param length {integer} Desired length
+    ## @param pad_char {character} Character to pad with
+    ## @return {string} Padded string
+    
+    _local result << str.copy()
+    
+    _while result.size < length
+    _loop
+        result << write_string(pad_char, result)
+    _endloop
+    
+    _return result
+_endmethod
+$
+
+## Pad string to specified length on the right
+_method string_utils.pad_right(str, length, pad_char)
+    ## Pads a string on the right to reach specified length
+    ## 
+    ## @param str {string} Input string
+    ## @param length {integer} Desired length
+    ## @param pad_char {character} Character to pad with
+    ## @return {string} Padded string
+    
+    _local result << str.copy()
+    
+    _while result.size < length
+    _loop
+        result << write_string(result, pad_char)
+    _endloop
+    
+    _return result
+_endmethod
+$
+
+## Split string by delimiter
+_method string_utils.split(str, delimiter)
+    ## Splits a string by a delimiter
+    ## 
+    ## @param str {string} Input string
+    ## @param delimiter {character} Delimiter character
+    ## @return {rope} Collection of substrings
+    
+    _local result << rope.new()
+    _local current << ""
+    
+    _for char _over str.fast_elements()
+    _loop
+        _if char = delimiter
+        _then
+            result.add(current)
+            current << ""
+        _else
+            current << write_string(current, char)
+        _endif
+    _endloop
+    
+    # Add last segment
+    result.add(current)
+    
+    _return result
+_endmethod
+$
+
+## Join strings with delimiter
+_method string_utils.join(strings, delimiter)
+    ## Joins a collection of strings with a delimiter
+    ## 
+    ## @param strings {collection} Collection of strings
+    ## @param delimiter {string} Delimiter string
+    ## @return {string} Joined string
+    
+    _local result << ""
+    _local first << _true
+    
+    _for s _over strings.fast_elements()
+    _loop
+        _if first
+        _then
+            result << s
+            first << _false
+        _else
+            result << write_string(result, delimiter, s)
+        _endif
+    _endloop
+    
+    _return result
+_endmethod
+$
+
+## Trim whitespace from string
+_method string_utils.trim(str)
+    ## Removes leading and trailing whitespace from a string
+    ## 
+    ## @param str {string} Input string
+    ## @return {string} Trimmed string
+    
+    _local start << 1
+    _local finish << str.size
+    
+    # Find first non-whitespace
+    _while start <= finish _andif _self.is_whitespace?(str[start])
+    _loop
+        start << start + 1
+    _endloop
+    
+    # Find last non-whitespace
+    _while finish >= start _andif _self.is_whitespace?(str[finish])
+    _loop
+        finish << finish - 1
+    _endloop
+    
+    _if start > finish
+    _then
+        _return ""
+    _endif
+    
+    _return str.slice(start, finish - start + 1)
+_endmethod
+$
+
+## Check if character is whitespace
+_private _method string_utils.is_whitespace?(char)
+    ## Checks if a character is whitespace
+    ## 
+    ## @param char {character} Character to check
+    ## @return {boolean} True if whitespace
+    
+    _return char = %space _orif char = %tab _orif char = %newline
+_endmethod
+$
+
+## Reverse a string
+_method string_utils.reverse(str)
+    ## Reverses a string
+    ## 
+    ## @param str {string} Input string
+    ## @return {string} Reversed string
+    
+    _local result << ""
+    
+    _for i _over range(str.size, 1, -1)
+    _loop
+        result << write_string(result, str[i])
+    _endloop
+    
+    _return result
+_endmethod
+$
+
+## Demo string utilities
+_method object.demo_string_utils()
+    ## Demonstrates string utility functions
+    ## 
+    ## @return _unset
+    
+    write("=== String Utilities ===")
+    write("")
+    
+    _local utils << string_utils
+    
+    # Padding
+    write("String padding:")
+    write("  '42' padded left to 5 with '0': '", utils.pad_left("42", 5, %0), "'")
+    write("  'Hi' padded right to 10 with '-': '", utils.pad_right("Hi", 10, %-), "'")
+    write("")
+    
+    # Split and join
+    write("Split and join:")
+    _local parts << utils.split("apple,banana,cherry", %,)
+    write("  Split 'apple,banana,cherry': ", parts.as_simple_vector())
+    write("  Join with ' | ': ", utils.join(parts, " | "))
+    write("")
+    
+    # Trim
+    write("Trim whitespace:")
+    write("  Trimmed '  hello  ': '", utils.trim("  hello  "), "'")
+    write("")
+    
+    # Reverse
+    write("String reverse:")
+    write("  Reversed 'Hello': '", utils.reverse("Hello"), "'")
+    write("  Reversed 'racecar': '", utils.reverse("racecar"), "'")
+    
+    _return _unset
+_endmethod
+$
+
+
+##======================================================================
+## Data Validation Utilities
+##======================================================================
+
+def_slotted_exemplar(:validator,
+    {},
+    {:object})
+$
+
+## Validate email format (simple check)
+_method validator.is_valid_email?(email)
+    ## Checks if string looks like a valid email
+    ## 
+    ## @param email {string} Email to validate
+    ## @return {boolean} True if valid format
+    
+    _if email.size < 5
+    _then
+        _return _false
+    _endif
+    
+    _local at_count << 0
+    _local dot_after_at << _false
+    _local at_position << 0
+    
+    _for i, char _over email.fast_keys_and_elements()
+    _loop
+        _if char = %@
+        _then
+            at_count << at_count + 1
+            at_position << i
+        _endif
+        
+        _if at_position > 0 _andif i > at_position _andif char = %.
+        _then
+            dot_after_at << _true
+        _endif
+    _endloop
+    
+    _return at_count = 1 _andif at_position > 1 _andif dot_after_at
+_endmethod
+$
+
+## Validate numeric string
+_method validator.is_numeric?(str)
+    ## Checks if string contains only digits
+    ## 
+    ## @param str {string} String to validate
+    ## @return {boolean} True if numeric
+    
+    _if str.empty?
+    _then
+        _return _false
+    _endif
+    
+    _for char _over str.fast_elements()
+    _loop
+        _if char < %0 _orif char > %9
+        _then
+            _return _false
+        _endif
+    _endloop
+    
+    _return _true
+_endmethod
+$
+
+## Validate string length
+_method validator.is_valid_length?(str, min_length, max_length)
+    ## Checks if string length is within bounds
+    ## 
+    ## @param str {string} String to validate
+    ## @param min_length {integer} Minimum length
+    ## @param max_length {integer} Maximum length
+    ## @return {boolean} True if valid length
+    
+    _local len << str.size
+    _return len >= min_length _andif len <= max_length
+_endmethod
+$
+
+## Demo validation utilities
+_method object.demo_validation()
+    ## Demonstrates validation utility functions
+    ## 
+    ## @return _unset
+    
+    write("=== Validation Utilities ===")
+    write("")
+    
+    _local val << validator
+    
+    # Email validation
+    write("Email validation:")
+    write("  'user@example.com': ", val.is_valid_email?("user@example.com"))
+    write("  'invalid-email': ", val.is_valid_email?("invalid-email"))
+    write("  'no@dot': ", val.is_valid_email?("no@dot"))
+    write("")
+    
+    # Numeric validation
+    write("Numeric validation:")
+    write("  '12345': ", val.is_numeric?("12345"))
+    write("  '123a5': ", val.is_numeric?("123a5"))
+    write("  '': ", val.is_numeric?(""))
+    write("")
+    
+    # Length validation
+    write("Length validation (min=3, max=10):")
+    write("  'Hi': ", val.is_valid_length?("Hi", 3, 10))
+    write("  'Hello': ", val.is_valid_length?("Hello", 3, 10))
+    write("  'Hello World!': ", val.is_valid_length?("Hello World!", 3, 10))
+    
+    _return _unset
+_endmethod
+$
+
+
+##======================================================================
+## Math Utilities
+##======================================================================
+
+def_slotted_exemplar(:math_utils,
+    {},
+    {:object})
+$
+
+## Calculate factorial
+_method math_utils.factorial(n)
+    ## Calculates factorial of n
+    ## 
+    ## @param n {integer} Number
+    ## @return {integer} n!
+    
+    _if n <= 1
+    _then
+        _return 1
+    _endif
+    
+    _local result << 1
+    _for i _over range(2, n)
+    _loop
+        result << result * i
+    _endloop
+    
+    _return result
+_endmethod
+$
+
+## Calculate greatest common divisor
+_method math_utils.gcd(a, b)
+    ## Calculates GCD using Euclidean algorithm
+    ## 
+    ## @param a {integer} First number
+    ## @param b {integer} Second number
+    ## @return {integer} GCD of a and b
+    
+    _while b ~= 0
+    _loop
+        _local temp << b
+        b << a _mod b
+        a << temp
+    _endloop
+    
+    _return a
+_endmethod
+$
+
+## Calculate least common multiple
+_method math_utils.lcm(a, b)
+    ## Calculates LCM of two numbers
+    ## 
+    ## @param a {integer} First number
+    ## @param b {integer} Second number
+    ## @return {integer} LCM of a and b
+    
+    _return (a * b) / _self.gcd(a, b)
+_endmethod
+$
+
+## Check if number is prime
+_method math_utils.is_prime?(n)
+    ## Checks if a number is prime
+    ## 
+    ## @param n {integer} Number to check
+    ## @return {boolean} True if prime
+    
+    _if n < 2
+    _then
+        _return _false
+    _endif
+    
+    _if n = 2
+    _then
+        _return _true
+    _endif
+    
+    _if (n _mod 2) = 0
+    _then
+        _return _false
+    _endif
+    
+    _local limit << n.sqrt.floor
+    _for i _over range(3, limit, 2)
+    _loop
+        _if (n _mod i) = 0
+        _then
+            _return _false
+        _endif
+    _endloop
+    
+    _return _true
+_endmethod
+$
+
+## Generate Fibonacci sequence
+_method math_utils.fibonacci_sequence(count)
+    ## Generates Fibonacci sequence
+    ## 
+    ## @param count {integer} Number of elements
+    ## @return {simple_vector} Fibonacci sequence
+    
+    _if count <= 0
+    _then
+        _return {}
+    _endif
+    
+    _local result << rope.new()
+    
+    _if count >= 1
+    _then
+        result.add(0)
+    _endif
+    
+    _if count >= 2
+    _then
+        result.add(1)
+    _endif
+    
+    _for i _over range(3, count)
+    _loop
+        _local next_val << result[i - 1] + result[i - 2]
+        result.add(next_val)
+    _endloop
+    
+    _return result.as_simple_vector()
+_endmethod
+$
+
+## Demo math utilities
+_method object.demo_math()
+    ## Demonstrates math utility functions
+    ## 
+    ## @return _unset
+    
+    write("=== Math Utilities ===")
+    write("")
+    
+    _local utils << math_utils
+    
+    # Factorial
+    write("Factorial:")
+    write("  5! = ", utils.factorial(5))
+    write("  10! = ", utils.factorial(10))
+    write("")
+    
+    # GCD and LCM
+    write("GCD and LCM:")
+    write("  GCD(48, 18) = ", utils.gcd(48, 18))
+    write("  LCM(12, 18) = ", utils.lcm(12, 18))
+    write("")
+    
+    # Prime check
+    write("Prime numbers:")
+    write("  Is 17 prime? ", utils.is_prime?(17))
+    write("  Is 18 prime? ", utils.is_prime?(18))
+    write("  Is 2 prime? ", utils.is_prime?(2))
+    write("")
+    
+    # Fibonacci
+    write("Fibonacci sequence (first 10):")
+    write("  ", utils.fibonacci_sequence(10))
+    
+    _return _unset
+_endmethod
+$
+
+
+##======================================================================
+## Master demo method
+##======================================================================
+
+_method object.demo_practical_examples()
+    ## Runs all practical example demonstrations
+    ## 
+    ## @return _unset
+    
+    write("========================================")
+    write("  PRACTICAL EXAMPLES DEMONSTRATION")
+    write("========================================")
+    write("")
+    
+    _self.demo_geometry()
+    write("")
+    _self.demo_string_utils()
+    write("")
+    _self.demo_validation()
+    write("")
+    _self.demo_math()
+    
+    _return _unset
+_endmethod
+$

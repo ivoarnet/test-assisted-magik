@@ -1,0 +1,413 @@
+#% text_encoding = iso8859_1
+##
+## @name 06_collections.magik
+## @description Demonstrates collections (vectors, hash tables, etc.) in Magik
+## @author Copilot AI Assistant
+##
+
+_package sw
+
+$
+
+##======================================================================
+## Simple Vectors
+##======================================================================
+
+_method object.demo_simple_vector()
+    ## Demonstrates simple_vector operations
+    ## 
+    ## @return _unset
+    
+    write("=== Simple Vector (Array) ===")
+    write("")
+    
+    # Creating simple vectors
+    _local numbers << {1, 2, 3, 4, 5}
+    _local mixed << {"string", 42, :symbol, 3.14, _true}
+    _local empty << {}
+    
+    write("Numbers vector: ", numbers)
+    write("Mixed vector: ", mixed)
+    write("Empty vector: ", empty)
+    write("")
+    
+    # Accessing elements (1-based indexing)
+    write("Accessing elements:")
+    write("  numbers[1]: ", numbers[1])      # First element
+    write("  numbers[3]: ", numbers[3])      # Third element
+    write("  numbers.last: ", numbers.last)  # Last element
+    write("  numbers.size: ", numbers.size)  # Length
+    write("")
+    
+    # Modifying elements
+    _local mutable << {"a", "b", "c"}
+    write("Before modification: ", mutable)
+    mutable[2] << "B"
+    write("After mutable[2] << 'B': ", mutable)
+    write("")
+    
+    # Iteration
+    write("Iterating over numbers:")
+    _for n _over numbers.fast_elements()
+    _loop
+        write("  Element: ", n)
+    _endloop
+    write("")
+    
+    # Iteration with index
+    write("Iterating with index:")
+    _for i, val _over numbers.fast_keys_and_elements()
+    _loop
+        write("  Index ", i, ": ", val)
+    _endloop
+    write("")
+    
+    # Vector methods
+    write("Vector methods:")
+    write("  numbers.includes?(3): ", numbers.includes?(3))
+    write("  numbers.includes?(10): ", numbers.includes?(10))
+    write("  numbers.index_of(4): ", numbers.index_of(4))
+    
+    _return _unset
+_endmethod
+$
+
+##======================================================================
+## Rope (Dynamic Array)
+##======================================================================
+
+_method object.demo_rope()
+    ## Demonstrates rope operations (dynamic array)
+    ## 
+    ## @return _unset
+    
+    write("=== Rope (Dynamic Array) ===")
+    write("")
+    
+    # Creating a rope
+    _local my_rope << rope.new()
+    
+    # Adding elements
+    write("Adding elements to rope:")
+    my_rope.add("first")
+    my_rope.add("second")
+    my_rope.add("third")
+    write("  Rope after adds: ", my_rope)
+    write("  Size: ", my_rope.size)
+    write("")
+    
+    # Adding at specific position
+    my_rope.add_at("inserted", 2)
+    write("After add_at(2): ", my_rope)
+    write("")
+    
+    # Removing elements
+    my_rope.remove_last()
+    write("After remove_last: ", my_rope)
+    write("")
+    
+    # Converting to simple vector
+    _local as_vector << my_rope.as_simple_vector()
+    write("As simple vector: ", as_vector)
+    write("")
+    
+    # Rope from existing collection
+    _local from_vector << rope.new_from({1, 2, 3, 4, 5})
+    write("Rope from vector: ", from_vector)
+    
+    _return _unset
+_endmethod
+$
+
+##======================================================================
+## Hash Table (Dictionary)
+##======================================================================
+
+_method object.demo_hash_table()
+    ## Demonstrates hash_table (dictionary) operations
+    ## 
+    ## @return _unset
+    
+    write("=== Hash Table (Dictionary) ===")
+    write("")
+    
+    # Creating a hash table
+    _local person << hash_table.new()
+    
+    # Adding key-value pairs
+    person[:name] << "John Doe"
+    person[:age] << 30
+    person[:email] << "john@example.com"
+    person[:active] << _true
+    
+    write("Hash table contents:")
+    write("  person[:name]: ", person[:name])
+    write("  person[:age]: ", person[:age])
+    write("  person[:email]: ", person[:email])
+    write("  person[:active]: ", person[:active])
+    write("")
+    
+    # Checking for keys
+    write("Key checking:")
+    write("  includes_key?(:name): ", person.includes_key?(:name))
+    write("  includes_key?(:phone): ", person.includes_key?(:phone))
+    write("")
+    
+    # Safe access with default
+    _local phone << person[:phone]
+    write("  person[:phone] (unset): ", phone)
+    write("")
+    
+    # Iterating over hash table
+    write("Iterating over keys:")
+    _for key _over person.fast_keys()
+    _loop
+        write("  Key: ", key)
+    _endloop
+    write("")
+    
+    write("Iterating over key-value pairs:")
+    _for key, value _over person.fast_keys_and_elements()
+    _loop
+        write("  ", key, " => ", value)
+    _endloop
+    write("")
+    
+    # Size
+    write("Size of hash table: ", person.size)
+    write("")
+    
+    # Removing entries
+    person.remove_key(:email)
+    write("After removing :email key:")
+    _for key, value _over person.fast_keys_and_elements()
+    _loop
+        write("  ", key, " => ", value)
+    _endloop
+    
+    _return _unset
+_endmethod
+$
+
+##======================================================================
+## Property List
+##======================================================================
+
+_method object.demo_property_list()
+    ## Demonstrates property_list operations
+    ## 
+    ## @return _unset
+    
+    write("=== Property List ===")
+    write("")
+    
+    # Creating a property list
+    _local props << property_list.new_with(
+        :width, 100,
+        :height, 200,
+        :color, :blue,
+        :visible, _true
+    )
+    
+    write("Property list contents:")
+    _for key, value _over props.fast_keys_and_elements()
+    _loop
+        write("  ", key, ": ", value)
+    _endloop
+    write("")
+    
+    # Accessing values
+    write("Accessing values:")
+    write("  props[:width]: ", props[:width])
+    write("  props[:color]: ", props[:color])
+    write("")
+    
+    # Modifying values
+    props[:height] << 250
+    write("After modifying height: ", props[:height])
+    
+    _return _unset
+_endmethod
+$
+
+##======================================================================
+## Sets
+##======================================================================
+
+_method object.demo_set()
+    ## Demonstrates set operations
+    ## 
+    ## @return _unset
+    
+    write("=== Set Operations ===")
+    write("")
+    
+    # Creating sets
+    _local set_a << set.new_from({1, 2, 3, 4, 5})
+    _local set_b << set.new_from({4, 5, 6, 7, 8})
+    
+    write("Set A: ", set_a)
+    write("Set B: ", set_b)
+    write("")
+    
+    # Adding to set
+    _local my_set << set.new()
+    my_set.add("apple")
+    my_set.add("banana")
+    my_set.add("apple")  # Duplicate, won't be added
+    write("Set with duplicates ignored: ", my_set)
+    write("")
+    
+    # Set operations
+    write("Set operations:")
+    write("  A includes 3?: ", set_a.includes?(3))
+    write("  A includes 10?: ", set_a.includes?(10))
+    write("  Size of A: ", set_a.size)
+    write("")
+    
+    # Iterating over set
+    write("Iterating over set A:")
+    _for item _over set_a.fast_elements()
+    _loop
+        write("  ", item)
+    _endloop
+    
+    _return _unset
+_endmethod
+$
+
+##======================================================================
+## Stack and Queue patterns
+##======================================================================
+
+_method object.demo_stack_and_queue()
+    ## Demonstrates stack and queue patterns using rope
+    ## 
+    ## @return _unset
+    
+    write("=== Stack Pattern (LIFO) ===")
+    write("")
+    
+    # Stack using rope
+    _local stack << rope.new()
+    
+    # Push operations
+    stack.add_last("A")
+    stack.add_last("B")
+    stack.add_last("C")
+    write("Stack after pushes: ", stack)
+    
+    # Pop operations
+    _local popped << stack.remove_last()
+    write("Popped: ", popped)
+    write("Stack after pop: ", stack)
+    write("")
+    
+    write("=== Queue Pattern (FIFO) ===")
+    write("")
+    
+    # Queue using rope
+    _local queue << rope.new()
+    
+    # Enqueue operations
+    queue.add_last("First")
+    queue.add_last("Second")
+    queue.add_last("Third")
+    write("Queue after enqueues: ", queue)
+    
+    # Dequeue operations
+    _local dequeued << queue.remove_first()
+    write("Dequeued: ", dequeued)
+    write("Queue after dequeue: ", queue)
+    
+    _return _unset
+_endmethod
+$
+
+##======================================================================
+## Sorting and Filtering
+##======================================================================
+
+_method object.demo_sorting_filtering()
+    ## Demonstrates sorting and filtering collections
+    ## 
+    ## @return _unset
+    
+    write("=== Sorting and Filtering ===")
+    write("")
+    
+    # Sorting numbers
+    _local numbers << {5, 2, 8, 1, 9, 3, 7, 4, 6}
+    write("Original: ", numbers)
+    
+    _local sorted << sorted_collection.new_from(numbers)
+    write("Sorted: ", sorted.as_simple_vector())
+    write("")
+    
+    # Filtering (manual approach)
+    write("Filtering (keep only > 5):")
+    _local filtered << rope.new()
+    _for n _over numbers.fast_elements()
+    _loop
+        _if n > 5
+        _then
+            filtered.add(n)
+        _endif
+    _endloop
+    write("  Filtered: ", filtered.as_simple_vector())
+    write("")
+    
+    # Mapping (manual approach)
+    write("Mapping (square each number):")
+    _local mapped << rope.new()
+    _for n _over numbers.fast_elements()
+    _loop
+        mapped.add(n * n)
+    _endloop
+    write("  Squared: ", mapped.as_simple_vector())
+    write("")
+    
+    # Reduce (sum)
+    write("Reduce (sum all numbers):")
+    _local sum << 0
+    _for n _over numbers.fast_elements()
+    _loop
+        sum << sum + n
+    _endloop
+    write("  Sum: ", sum)
+    
+    _return _unset
+_endmethod
+$
+
+##======================================================================
+## Master demo method
+##======================================================================
+
+_method object.demo_collections()
+    ## Runs all collection demonstrations
+    ## 
+    ## @return _unset
+    
+    write("========================================")
+    write("  COLLECTIONS DEMONSTRATION")
+    write("========================================")
+    write("")
+    
+    _self.demo_simple_vector()
+    write("")
+    _self.demo_rope()
+    write("")
+    _self.demo_hash_table()
+    write("")
+    _self.demo_property_list()
+    write("")
+    _self.demo_set()
+    write("")
+    _self.demo_stack_and_queue()
+    write("")
+    _self.demo_sorting_filtering()
+    
+    _return _unset
+_endmethod
+$

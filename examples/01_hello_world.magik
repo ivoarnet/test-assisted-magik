@@ -1,0 +1,67 @@
+#% text_encoding = iso8859_1
+##
+## @name 01_hello_world.magik
+## @description Basic Hello World example demonstrating Magik fundamentals
+## @author Copilot AI Assistant
+##
+
+_package sw
+
+$
+
+##
+## Simple Hello World - the most basic Magik program
+##
+_method object.hello_world()
+    ## Prints a simple hello world message to the terminal
+    ## 
+    ## @return _unset
+    
+    write("Hello, World!")
+    write("Welcome to Smallworld Magik programming!")
+    
+    _return _unset
+_endmethod
+$
+
+##
+## Greeting with a name parameter
+##
+_method object.greet(name)
+    ## Greets a person by name
+    ##
+    ## @param name {string} The name to greet
+    ## @return {string} The greeting message
+    
+    _local greeting << write_string("Hello, ", name, "! Welcome to Magik.")
+    write(greeting)
+    
+    _return greeting
+_endmethod
+$
+
+##
+## Demonstrate basic output methods
+##
+_method object.demo_output()
+    ## Demonstrates various output methods in Magik
+    ## 
+    ## @return _unset
+    
+    # Using write() - adds newline automatically
+    write("This is write() - adds newline")
+    
+    # Using print() - for formatted output
+    print("This is print() - also adds newline")
+    
+    # Using write_string() to build strings
+    _local message << write_string("Concatenated ", "string ", "example")
+    write(message)
+    
+    # Using format strings
+    _local formatted << write_string("The answer is: ", 42)
+    write(formatted)
+    
+    _return _unset
+_endmethod
+$

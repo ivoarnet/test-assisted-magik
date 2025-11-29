@@ -1,0 +1,221 @@
+#% text_encoding = iso8859_1
+##
+## @name 02_variables_and_types.magik
+## @description Demonstrates variables, data types, and basic operations in Magik
+## @author Copilot AI Assistant
+##
+
+_package sw
+
+$
+
+##
+## Demonstrate local and global variables
+##
+_method object.demo_variables()
+    ## Shows how to declare and use variables in Magik
+    ## 
+    ## @return _unset
+    
+    write("=== Variable Declaration Examples ===")
+    write("")
+    
+    # Local variables (preferred) - using << for assignment
+    _local my_integer << 42
+    _local my_float << 3.14159
+    _local my_string << "Hello Magik"
+    _local my_boolean << _true
+    _local my_symbol << :my_symbol
+    _local my_unset << _unset
+    
+    write("Local integer: ", my_integer)
+    write("Local float: ", my_float)
+    write("Local string: ", my_string)
+    write("Local boolean: ", my_boolean)
+    write("Local symbol: ", my_symbol)
+    write("Local unset: ", my_unset)
+    write("")
+    
+    # Constants (cannot be reassigned)
+    _constant pi << 3.14159265359
+    write("Constant PI: ", pi)
+    write("")
+    
+    # Dynamic variables (global scope within block)
+    _dynamic !output!
+    write("Dynamic variable example")
+    
+    _return _unset
+_endmethod
+$
+
+##
+## Demonstrate Magik data types
+##
+_method object.demo_data_types()
+    ## Shows various data types available in Magik
+    ## 
+    ## @return _unset
+    
+    write("=== Magik Data Types ===")
+    write("")
+    
+    # Integers
+    _local small_int << 100
+    _local large_int << 1000000000
+    _local negative_int << -500
+    _local hex_value << 16rFF           # Hexadecimal (255)
+    _local binary_value << 2r11111111   # Binary (255)
+    
+    write("Integer examples:")
+    write("  Small int: ", small_int)
+    write("  Large int: ", large_int)
+    write("  Negative: ", negative_int)
+    write("  Hex 0xFF: ", hex_value)
+    write("  Binary 11111111: ", binary_value)
+    write("")
+    
+    # Floating point numbers
+    _local float1 << 3.14
+    _local float2 << 2.5e10
+    _local float3 << 1.5e-5
+    
+    write("Float examples:")
+    write("  Float1: ", float1)
+    write("  Scientific notation: ", float2)
+    write("  Small float: ", float3)
+    write("")
+    
+    # Strings
+    _local simple_string << "Hello"
+    _local escaped_string << "Line1%nLine2"  # %n is newline
+    _local tab_string << "Col1%tCol2"        # %t is tab
+    
+    write("String examples:")
+    write("  Simple: ", simple_string)
+    write("  With newline: ", escaped_string)
+    write("  With tab: ", tab_string)
+    write("")
+    
+    # Symbols (like atoms in other languages)
+    _local symbol1 << :my_symbol
+    _local symbol2 << :another_symbol
+    _local pipe_symbol << :|symbol with spaces|
+    
+    write("Symbol examples:")
+    write("  Symbol1: ", symbol1)
+    write("  Symbol2: ", symbol2)
+    write("  Pipe symbol: ", pipe_symbol)
+    write("")
+    
+    # Characters
+    _local char_a << %a
+    _local char_space << %space
+    _local char_newline << %newline
+    
+    write("Character examples:")
+    write("  Char 'a': ", char_a)
+    write("  Space char: ", char_space)
+    write("")
+    
+    # Special values
+    _local unset_value << _unset
+    _local true_value << _true
+    _local false_value << _false
+    _local maybe_value << _maybe
+    
+    write("Special values:")
+    write("  Unset: ", unset_value)
+    write("  True: ", true_value)
+    write("  False: ", false_value)
+    write("  Maybe: ", maybe_value)
+    
+    _return _unset
+_endmethod
+$
+
+##
+## Demonstrate arithmetic operations
+##
+_method object.demo_arithmetic()
+    ## Shows arithmetic operations in Magik
+    ## 
+    ## @return _unset
+    
+    write("=== Arithmetic Operations ===")
+    write("")
+    
+    _local a << 10
+    _local b << 3
+    
+    # Basic operations
+    write("Given a = ", a, " and b = ", b)
+    write("  a + b = ", a + b)
+    write("  a - b = ", a - b)
+    write("  a * b = ", a * b)
+    write("  a / b = ", a / b)           # Integer division
+    write("  a.as_float / b = ", a.as_float / b)  # Float division
+    write("  a _mod b = ", a _mod b)     # Modulo
+    write("  a ** 2 = ", a ** 2)         # Power
+    write("")
+    
+    # Comparison operations
+    write("Comparison operations:")
+    write("  a = b: ", a = b)
+    write("  a ~= b: ", a ~= b)          # Not equal
+    write("  a < b: ", a < b)
+    write("  a > b: ", a > b)
+    write("  a <= b: ", a <= b)
+    write("  a >= b: ", a >= b)
+    write("")
+    
+    # Logical operations
+    _local x << _true
+    _local y << _false
+    
+    write("Logical operations (x=true, y=false):")
+    write("  x _and y: ", x _and y)
+    write("  x _or y: ", x _or y)
+    write("  _not x: ", _not x)
+    write("  x _xor y: ", x _xor y)
+    
+    _return _unset
+_endmethod
+$
+
+##
+## Demonstrate string operations
+##
+_method object.demo_string_operations()
+    ## Shows string manipulation in Magik
+    ## 
+    ## @return _unset
+    
+    write("=== String Operations ===")
+    write("")
+    
+    _local str1 << "Hello"
+    _local str2 << "World"
+    
+    # String concatenation
+    _local combined << write_string(str1, " ", str2)
+    write("Concatenation: ", combined)
+    
+    # String methods
+    write("String: '", str1, "'")
+    write("  Length (size): ", str1.size)
+    write("  Lowercase: ", str1.lowercase)
+    write("  Uppercase: ", str1.uppercase)
+    write("  First char: ", str1[1])
+    write("  Substring [1..3]: ", str1.slice(1, 3))
+    write("")
+    
+    # Checking content
+    _local test_str << "Hello World"
+    write("String: '", test_str, "'")
+    write("  Includes 'World': ", test_str.includes_match?("World"))
+    write("  Index of 'o': ", test_str.index_of(%o))
+    
+    _return _unset
+_endmethod
+$
