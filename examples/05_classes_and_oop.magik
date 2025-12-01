@@ -1,0 +1,440 @@
+#% text_encoding = iso8859_1
+##
+## @name 05_classes_and_oop.magik
+## @description Demonstrates Object-Oriented Programming in Magik
+## @author Copilot AI Assistant
+##
+
+_package sw
+
+$
+
+##======================================================================
+## Example 1: Defining a Simple Exemplar (Class)
+##======================================================================
+
+## Define a point exemplar (2D point)
+def_slotted_exemplar(:demo_point,
+    {
+        {:x, 0},
+        {:y, 0}
+    },
+    {:object})
+$
+
+## Constructor for demo_point
+_method demo_point.new(x, y)
+    ## Creates a new demo_point instance
+    ## 
+    ## @param x {number} X coordinate
+    ## @param y {number} Y coordinate
+    ## @return {demo_point} New point instance
+    
+    _local new_point << _clone
+    new_point.init(x, y)
+    _return new_point
+_endmethod
+$
+
+## Initializer
+_private _method demo_point.init(x, y)
+    ## Initializes the point with coordinates
+    ## 
+    ## @param x {number} X coordinate
+    ## @param y {number} Y coordinate
+    ## @return {demo_point} Self
+    
+    .x << x
+    .y << y
+    _return _self
+_endmethod
+$
+
+## Getter for X
+_method demo_point.get_x()
+    ## Returns the X coordinate
+    ## 
+    ## @return {number} X coordinate
+    
+    _return .x
+_endmethod
+$
+
+## Getter for Y
+_method demo_point.get_y()
+    ## Returns the Y coordinate
+    ## 
+    ## @return {number} Y coordinate
+    
+    _return .y
+_endmethod
+$
+
+## Setter for X
+_method demo_point.set_x(new_x)
+    ## Sets the X coordinate
+    ## 
+    ## @param new_x {number} New X coordinate
+    ## @return _unset
+    
+    .x << new_x
+    _return _unset
+_endmethod
+$
+
+## Setter for Y
+_method demo_point.set_y(new_y)
+    ## Sets the Y coordinate
+    ## 
+    ## @param new_y {number} New Y coordinate
+    ## @return _unset
+    
+    .y << new_y
+    _return _unset
+_endmethod
+$
+
+## Calculate distance from origin
+_method demo_point.distance_from_origin()
+    ## Calculates the Euclidean distance from the origin (0,0)
+    ## 
+    ## @return {float} Distance from origin
+    
+    _return (.x ** 2 + .y ** 2).sqrt
+_endmethod
+$
+
+## Calculate distance to another point
+_method demo_point.distance_to(other_point)
+    ## Calculates the Euclidean distance to another point
+    ## 
+    ## @param other_point {demo_point} The other point
+    ## @return {float} Distance to the other point
+    
+    _local dx << .x - other_point.get_x()
+    _local dy << .y - other_point.get_y()
+    _return (dx ** 2 + dy ** 2).sqrt
+_endmethod
+$
+
+## String representation
+_method demo_point.write_string
+    ## Returns a string representation of the point
+    ## 
+    ## @return {string} String representation
+    
+    _return write_string("Point(", .x, ", ", .y, ")")
+_endmethod
+$
+
+## Move the point
+_method demo_point.translate(dx, dy)
+    ## Moves the point by the given offset
+    ## 
+    ## @param dx {number} X offset
+    ## @param dy {number} Y offset
+    ## @return {demo_point} Self for chaining
+    
+    .x << .x + dx
+    .y << .y + dy
+    _return _self
+_endmethod
+$
+
+
+##======================================================================
+## Example 2: Inheritance with a 3D Point
+##======================================================================
+
+## Define a 3D point that inherits from demo_point
+def_slotted_exemplar(:demo_point_3d,
+    {
+        {:z, 0}
+    },
+    {:demo_point})
+$
+
+## Constructor for demo_point_3d
+_method demo_point_3d.new(x, y, z)
+    ## Creates a new demo_point_3d instance
+    ## 
+    ## @param x {number} X coordinate
+    ## @param y {number} Y coordinate
+    ## @param z {number} Z coordinate
+    ## @return {demo_point_3d} New 3D point instance
+    
+    _local new_point << _clone
+    new_point.init_3d(x, y, z)
+    _return new_point
+_endmethod
+$
+
+## Initializer for 3D point
+_private _method demo_point_3d.init_3d(x, y, z)
+    ## Initializes the 3D point with coordinates
+    ## 
+    ## @param x {number} X coordinate
+    ## @param y {number} Y coordinate
+    ## @param z {number} Z coordinate
+    ## @return {demo_point_3d} Self
+    
+    # Call parent initializer
+    _self.init(x, y)
+    .z << z
+    _return _self
+_endmethod
+$
+
+## Getter for Z
+_method demo_point_3d.get_z()
+    ## Returns the Z coordinate
+    ## 
+    ## @return {number} Z coordinate
+    
+    _return .z
+_endmethod
+$
+
+## Override distance from origin for 3D
+_method demo_point_3d.distance_from_origin()
+    ## Calculates the Euclidean distance from the origin (0,0,0) in 3D
+    ## 
+    ## @return {float} Distance from origin
+    
+    _return (.x ** 2 + .y ** 2 + .z ** 2).sqrt
+_endmethod
+$
+
+## Override string representation for 3D
+_method demo_point_3d.write_string
+    ## Returns a string representation of the 3D point
+    ## 
+    ## @return {string} String representation
+    
+    _return write_string("Point3D(", .x, ", ", .y, ", ", .z, ")")
+_endmethod
+$
+
+
+##======================================================================
+## Example 3: A Shape Class Hierarchy
+##======================================================================
+
+## Abstract base class for shapes
+def_slotted_exemplar(:demo_shape,
+    {
+        {:name, "shape"},
+        {:color, :black}
+    },
+    {:object})
+$
+
+## Constructor
+_method demo_shape.new(name, color)
+    ## Creates a new shape
+    ## 
+    ## @param name {string} Shape name
+    ## @param color {symbol} Shape color
+    ## @return {demo_shape} New shape instance
+    
+    _local new_shape << _clone
+    new_shape.init_shape(name, color)
+    _return new_shape
+_endmethod
+$
+
+_private _method demo_shape.init_shape(name, color)
+    ## Initializes the shape
+    ## 
+    ## @param name {string} Shape name
+    ## @param color {symbol} Shape color
+    ## @return {demo_shape} Self
+    
+    .name << name
+    .color << color
+    _return _self
+_endmethod
+$
+
+## Abstract method - must be overridden
+_method demo_shape.area()
+    ## Returns the area of the shape (abstract)
+    ## 
+    ## @return {float} Area
+    
+    _return 0.0
+_endmethod
+$
+
+## Abstract method - must be overridden
+_method demo_shape.perimeter()
+    ## Returns the perimeter of the shape (abstract)
+    ## 
+    ## @return {float} Perimeter
+    
+    _return 0.0
+_endmethod
+$
+
+_method demo_shape.describe()
+    ## Returns a description of the shape
+    ## 
+    ## @return {string} Description
+    
+    _return write_string(.name, " (", .color, ") - Area: ", _self.area(), 
+                         ", Perimeter: ", _self.perimeter())
+_endmethod
+$
+
+
+##======================================================================
+## Circle class
+##======================================================================
+
+def_slotted_exemplar(:demo_circle,
+    {
+        {:radius, 1.0}
+    },
+    {:demo_shape})
+$
+
+_method demo_circle.new(radius, color)
+    ## Creates a new circle
+    ## 
+    ## @param radius {float} Circle radius
+    ## @param color {symbol} Circle color
+    ## @return {demo_circle} New circle instance
+    
+    _local new_circle << _clone
+    new_circle.init_shape("circle", color)
+    new_circle.radius << radius
+    _return new_circle
+_endmethod
+$
+
+_method demo_circle.area()
+    ## Returns the area of the circle
+    ## 
+    ## @return {float} Area (pi * r^2)
+    
+    _return 3.14159265359 * .radius ** 2
+_endmethod
+$
+
+_method demo_circle.perimeter()
+    ## Returns the circumference of the circle
+    ## 
+    ## @return {float} Circumference (2 * pi * r)
+    
+    _return 2 * 3.14159265359 * .radius
+_endmethod
+$
+
+
+##======================================================================
+## Rectangle class
+##======================================================================
+
+def_slotted_exemplar(:demo_rectangle,
+    {
+        {:width, 1.0},
+        {:height, 1.0}
+    },
+    {:demo_shape})
+$
+
+_method demo_rectangle.new(width, height, color)
+    ## Creates a new rectangle
+    ## 
+    ## @param width {float} Rectangle width
+    ## @param height {float} Rectangle height
+    ## @param color {symbol} Rectangle color
+    ## @return {demo_rectangle} New rectangle instance
+    
+    _local new_rect << _clone
+    new_rect.init_shape("rectangle", color)
+    new_rect.width << width
+    new_rect.height << height
+    _return new_rect
+_endmethod
+$
+
+_method demo_rectangle.area()
+    ## Returns the area of the rectangle
+    ## 
+    ## @return {float} Area (width * height)
+    
+    _return .width * .height
+_endmethod
+$
+
+_method demo_rectangle.perimeter()
+    ## Returns the perimeter of the rectangle
+    ## 
+    ## @return {float} Perimeter (2 * (width + height))
+    
+    _return 2 * (.width + .height)
+_endmethod
+$
+
+
+##======================================================================
+## Demonstration method
+##======================================================================
+
+_method object.demo_oop()
+    ## Demonstrates OOP concepts in Magik
+    ## 
+    ## @return _unset
+    
+    write("=== Object-Oriented Programming Demo ===")
+    write("")
+    
+    # Working with demo_point
+    write("2D Points:")
+    _local p1 << demo_point.new(3, 4)
+    _local p2 << demo_point.new(6, 8)
+    
+    write("  Point 1: ", p1)
+    write("  Point 2: ", p2)
+    write("  P1 distance from origin: ", p1.distance_from_origin())
+    write("  Distance P1 to P2: ", p1.distance_to(p2))
+    write("")
+    
+    # Translate a point
+    p1.translate(1, 1)
+    write("  P1 after translate(1,1): ", p1)
+    write("")
+    
+    # Working with 3D point (inheritance)
+    write("3D Points (Inheritance):")
+    _local p3d << demo_point_3d.new(1, 2, 2)
+    write("  3D Point: ", p3d)
+    write("  Distance from origin: ", p3d.distance_from_origin())
+    write("")
+    
+    # Working with shapes (polymorphism)
+    write("Shapes (Polymorphism):")
+    _local circle << demo_circle.new(5, :red)
+    _local rect << demo_rectangle.new(4, 6, :blue)
+    
+    write("  ", circle.describe())
+    write("  ", rect.describe())
+    write("")
+    
+    # Collection of shapes
+    write("Processing a collection of shapes:")
+    _local shapes << {circle, rect}
+    _local total_area << 0.0
+    
+    _for shape _over shapes.fast_elements()
+    _loop
+        write("  ", shape.name, " area: ", shape.area())
+        total_area << total_area + shape.area()
+    _endloop
+    
+    write("  Total area: ", total_area)
+    
+    _return _unset
+_endmethod
+$

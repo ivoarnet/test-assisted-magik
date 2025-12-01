@@ -1,0 +1,274 @@
+#% text_encoding = iso8859_1
+##
+## @name 04_procedures.magik
+## @description Demonstrates procedures (functions/methods) in Magik
+## @author Copilot AI Assistant
+##
+
+_package sw
+
+$
+
+##
+## Simple procedure without parameters
+##
+_method object.simple_procedure()
+    ## A simple procedure that returns a greeting
+    ## 
+    ## @return {string} A greeting message
+    
+    _return "Hello from a simple procedure!"
+_endmethod
+$
+
+##
+## Procedure with required parameters
+##
+_method object.add_numbers(a, b)
+    ## Adds two numbers together
+    ## 
+    ## @param a {number} First number
+    ## @param b {number} Second number
+    ## @return {number} The sum of a and b
+    
+    _return a + b
+_endmethod
+$
+
+##
+## Procedure with optional parameters
+##
+_method object.greet_person(name, _optional title, suffix)
+    ## Greets a person with optional title and suffix
+    ## 
+    ## @param name {string} The person's name
+    ## @param title {string} Optional title (Mr., Mrs., Dr., etc.)
+    ## @param suffix {string} Optional suffix (Jr., Sr., PhD, etc.)
+    ## @return {string} The formatted greeting
+    
+    # Handle optional parameters with defaults
+    _if title _is _unset
+    _then
+        title << ""
+    _else
+        title << write_string(title, " ")
+    _endif
+    
+    _if suffix _is _unset
+    _then
+        suffix << ""
+    _else
+        suffix << write_string(", ", suffix)
+    _endif
+    
+    _local greeting << write_string("Hello, ", title, name, suffix, "!")
+    _return greeting
+_endmethod
+$
+
+##
+## Procedure with gather (variadic) parameters
+##
+_method object.calculate_sum(_gather numbers)
+    ## Calculates the sum of any number of values
+    ## 
+    ## @param numbers {sequence} Variable number of numeric arguments
+    ## @return {number} The sum of all provided numbers
+    
+    _local total << 0
+    
+    _for num _over numbers.fast_elements()
+    _loop
+        total << total + num
+    _endloop
+    
+    _return total
+_endmethod
+$
+
+##
+## Procedure returning multiple values
+##
+_method object.get_min_max(values)
+    ## Returns both minimum and maximum values from a collection
+    ## 
+    ## @param values {simple_vector} Collection of numbers
+    ## @return {integer, integer} Tuple of (min, max)
+    
+    _if values.empty?
+    _then
+        _return (_unset, _unset)
+    _endif
+    
+    _local min_val << values[1]
+    _local max_val << values[1]
+    
+    _for val _over values.fast_elements()
+    _loop
+        _if val < min_val
+        _then
+            min_val << val
+        _endif
+        _if val > max_val
+        _then
+            max_val << val
+        _endif
+    _endloop
+    
+    _return (min_val, max_val)
+_endmethod
+$
+
+##
+## Recursive procedure
+##
+_method object.factorial(n)
+    ## Calculates the factorial of n recursively
+    ## 
+    ## @param n {integer} The number to calculate factorial for
+    ## @return {integer} n!
+    
+    _if n <= 1
+    _then
+        _return 1
+    _else
+        _return n * _self.factorial(n - 1)
+    _endif
+_endmethod
+$
+
+##
+## Another recursive example - Fibonacci
+##
+_method object.fibonacci(n)
+    ## Calculates the nth Fibonacci number
+    ## 
+    ## @param n {integer} The position in Fibonacci sequence
+    ## @return {integer} The nth Fibonacci number
+    
+    _if n <= 0
+    _then
+        _return 0
+    _elif n = 1
+    _then
+        _return 1
+    _else
+        _return _self.fibonacci(n - 1) + _self.fibonacci(n - 2)
+    _endif
+_endmethod
+$
+
+##
+## Higher-order procedure - takes a procedure as argument
+##
+_method object.apply_operation(a, b, operation)
+    ## Applies a given operation to two numbers
+    ## 
+    ## @param a {number} First operand
+    ## @param b {number} Second operand
+    ## @param operation {procedure} The operation to apply
+    ## @return {number} Result of applying operation
+    
+    _return operation.invoke(a, b)
+_endmethod
+$
+
+##
+## Demonstrate using procedures
+##
+_method object.demo_procedures()
+    ## Demonstrates various procedure patterns
+    ## 
+    ## @return _unset
+    
+    write("=== Procedure Examples ===")
+    write("")
+    
+    # Simple procedure
+    write("Simple procedure: ", _self.simple_procedure())
+    write("")
+    
+    # Procedure with parameters
+    write("Adding 5 + 3: ", _self.add_numbers(5, 3))
+    write("")
+    
+    # Optional parameters
+    write("Greetings:")
+    write("  ", _self.greet_person("Smith"))
+    write("  ", _self.greet_person("Smith", "Dr."))
+    write("  ", _self.greet_person("Smith", "Dr.", "PhD"))
+    write("")
+    
+    # Gather parameters
+    write("Sum of 1,2,3,4,5: ", _self.calculate_sum(1, 2, 3, 4, 5))
+    write("")
+    
+    # Multiple return values
+    _local (min_v, max_v) << _self.get_min_max({5, 2, 8, 1, 9, 3})
+    write("Min/Max of {5,2,8,1,9,3}: ", min_v, " / ", max_v)
+    write("")
+    
+    # Recursion
+    write("Factorial of 5: ", _self.factorial(5))
+    write("Fibonacci(10): ", _self.fibonacci(10))
+    write("")
+    
+    # Lambda/Anonymous procedures
+    write("Lambda procedures:")
+    _local square << _proc(x) >> x * x _endproc
+    write("  Square of 7: ", square.invoke(7))
+    
+    _local add << _proc(x, y) >> x + y _endproc
+    write("  Add 3 + 4: ", add.invoke(3, 4))
+    write("")
+    
+    # Using higher-order function
+    write("Higher-order function:")
+    _local multiply << _proc(a, b) >> a * b _endproc
+    write("  Apply multiply to (6, 7): ", _self.apply_operation(6, 7, multiply))
+    
+    _return _unset
+_endmethod
+$
+
+##
+## Procedure with iter (iterator pattern)
+##
+_iter _method object.number_generator(start, stop, step)
+    ## Generates numbers from start to stop with given step
+    ## 
+    ## @param start {integer} Starting value
+    ## @param stop {integer} Ending value
+    ## @param step {integer} Step increment
+    ## @yields {integer} Each number in the sequence
+    
+    _local current << start
+    
+    _while current <= stop
+    _loop
+        _loopbody(current)
+        current << current + step
+    _endloop
+_endmethod
+$
+
+##
+## Demonstrate iterators
+##
+_method object.demo_iterators()
+    ## Shows how to use iterator methods
+    ## 
+    ## @return _unset
+    
+    write("=== Iterator Example ===")
+    write("")
+    
+    write("Numbers from 1 to 10, step 2:")
+    _for n _over _self.number_generator(1, 10, 2)
+    _loop
+        write("  ", n)
+    _endloop
+    
+    _return _unset
+_endmethod
+$
